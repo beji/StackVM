@@ -17,6 +17,7 @@ module Types =
         | Multiply
         | Print
         | Ignore
+        | Halt
 
 module AssemblyParser =
 
@@ -41,6 +42,7 @@ module AssemblyParser =
     let getMultiplyLine = simpleLineHelper "mul" Multiply
     let getDivisionLine = simpleLineHelper "div" Divide
     let getPopLine = simpleLineHelper "pop" Pop
+    let getHaltLine = simpleLineHelper "halt" Halt
 
     let getPushLine input =
         if input = null then None
@@ -75,7 +77,8 @@ module AssemblyParser =
                 return! getDivisionLine line
                 return! getMultiplyLine line
                 return! getPrintLine line
-                return! getPopLine line                
+                return! getPopLine line  
+                return! getHaltLine line              
             }
             match statement with
             | Some x -> x
@@ -150,6 +153,9 @@ module Stack =
                 printfn "%s printing the current head" dbgIdentifier
                 printfn "%i" <| List.head currentState
                 currentState
+            | Halt ->
+                printfn "%s halt detected" dbgIdentifier
+                currentState
             | Ignore ->
                 printfn "%s i do not know that instruction" dbgIdentifier 
                 currentState
@@ -157,9 +163,11 @@ module Stack =
         let rec _fold stack instructions =
             match instructions with
             | instruction::tail ->
-                //A halt instruction could be dealt with here
-                let newstate = calcNewState stack instruction
-                _fold newstate tail
+                match instruction with
+                | Halt -> stack
+                | _ ->
+                    let newstate = calcNewState stack instruction
+                    _fold newstate tail
             | [] ->
                 stack
         _fold state instructions

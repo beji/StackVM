@@ -59,6 +59,13 @@ module Instructions =
             |> Stack.fold Stack.initialState
         Assert.AreEqual(List.head result, 4)
 
+    [<Test>]
+    let ``Halt stops the stack from being changed further`` () =
+        let result =
+            [Push 40; Halt; Push 2]
+            |> Stack.fold Stack.initialState
+        Assert.AreEqual(List.head result, 40)
+
 module Parser =
     [<Test>]
     let ``push 6 leads to Push 6 Instruction`` () =
@@ -99,3 +106,8 @@ module Parser =
     let ``pop leads to Pop Instruction`` () =
         let result = AssemblyParser.parse ["pop"]
         Assert.AreEqual(List.head result, Pop)                                
+
+    [<Test>]
+    let ``halt leads to Halt Instruction`` () =
+        let result = AssemblyParser.parse ["halt"]
+        Assert.AreEqual(List.head result, Halt)                                        
