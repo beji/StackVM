@@ -1,8 +1,8 @@
-# Eine kleine Testdatei, nix besonderes
+# Just a small test file
 push 5
 push 4
 add
-# ich bin ein kommentar, ich tue nix
+# print shouldn't really be in the asm :)
 print
 push 9
 mul
@@ -11,4 +11,12 @@ push 1
 sub
 push 2
 div
+print
+push 40
+sub
+halt
+# Nothing below the halt should be executed
+push 2
+push 3
+add
 print
