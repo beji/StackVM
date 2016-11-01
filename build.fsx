@@ -43,21 +43,38 @@ Target "Test" (fun _ ->
             ToolPath = "./packages/test/NUnit.ConsoleRunner/tools/nunit3-console.exe"})
 )
 
-Target "Release" (fun _ ->
+Target "TestRelease" (fun _ ->
+    let testDll = !! (releaseDir + "/Tests.dll")
+    testDll
+    |> NUnit3 (fun p ->
+        {p with
+            ToolPath = "./packages/test/NUnit.ConsoleRunner/tools/nunit3-console.exe"})
+)
+
+
+Target "BuildRelease" (fun _ ->
     MSBuildRelease releaseDir "Build" appReferences
     |> Log "AppBuild-Output:"
 )
 
+Target "Release" (fun _ -> ())
+
 "Clean"
 ==> "Build"
 
-"Release"
+"Clean"
+==> "BuildRelease"
+
+"TestRelease"
 ==> "Deploy"
 
 "Build"
 ==> "Test"
 
-"Test"
+"BuildRelease"
+==> "TestRelease"
+
+"TestRelease"
 ==> "Release"
 
 // start build
