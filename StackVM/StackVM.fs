@@ -98,6 +98,8 @@ module Compiler =
     let serializeSasm = serializeBinary<Instruction list>
     let deserializeSasm = deserializeBinary<Instruction list>
 
+    let stripIgnores = List.filter(fun instruction -> instruction = Ignore |> not)
+
 module Stack =
     let initialState = []
 
@@ -220,6 +222,7 @@ module Main =
                             |> Array.toList
                             |> AssemblyParser.strip
                             |> AssemblyParser.parse
+                            |> Compiler.stripIgnores
                             |> Compiler.serializeSasm
 
                         if not <| File.Exists target then
