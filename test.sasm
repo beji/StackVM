@@ -1,0 +1,14 @@
+# Eine kleine Testdatei, nix besonderes
+push 5
+push 4
+add
+# ich bin ein kommentar, ich tue nix
+print
+push 9
+mul
+print
+push 1
+sub
+push 2
+div
+print

@@ -311,6 +311,9 @@ csx/
 ecf/
 rcf/
 
+# nuget packages
+packages
+
 # Windows Store app package directories and files
 AppPackages/
 BundleArtifacts/
