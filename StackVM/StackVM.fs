@@ -14,7 +14,7 @@ module Types =
         | Add
         | Subtract
         | Divide
-        | Multipy
+        | Multiply
         | Print
         | Ignore
 
@@ -38,7 +38,7 @@ module AssemblyParser =
     let getPrintLine = simpleLineHelper "print" Print
     let getAddLine = simpleLineHelper "add" Add
     let getSubtractLine = simpleLineHelper "sub" Subtract
-    let getMultiplyLine = simpleLineHelper "mul" Multipy
+    let getMultiplyLine = simpleLineHelper "mul" Multiply
     let getDivisionLine = simpleLineHelper "div" Divide
     let getPopLine = simpleLineHelper "pop" Pop
 
@@ -138,13 +138,13 @@ module Stack =
                 | _ ->
                     printfn "%s something went horribly wrong with the stack while trying to divide" dbgIdentifier
                     currentState
-            | Multipy ->
+            | Multiply ->
                 match currentState with
                 | x::y::rst ->
                     printfn "%s multiplying %i and %i" dbgIdentifier x y
                     (y * x) :: rst
                 | _ ->
-                    printfn "%s something went horribly wrong with the stack while trying to multipy" dbgIdentifier
+                    printfn "%s something went horribly wrong with the stack while trying to Multiply" dbgIdentifier
                     currentState
             | Print ->
                 printfn "%s printing the current head" dbgIdentifier
@@ -153,11 +153,16 @@ module Stack =
             | Ignore ->
                 printfn "%s i do not know that instruction" dbgIdentifier 
                 currentState
-
     let fold state instructions =
-        List.fold(fun stack instruction ->
-            calcNewState stack instruction
-        ) state instructions
+        let rec _fold stack instructions =
+            match instructions with
+            | instruction::tail ->
+                //A halt instruction could be dealt with here
+                let newstate = calcNewState stack instruction
+                _fold newstate tail
+            | [] ->
+                stack
+        _fold state instructions
 
 module Main =
 
