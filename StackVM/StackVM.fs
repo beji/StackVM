@@ -17,7 +17,6 @@ module Types =
         | Multipy
         | Print
         | Ignore
-    type Message = Instruction * AsyncReplyChannel<Instruction>
 
 module AssemblyParser =
 
