@@ -35,7 +35,7 @@ Target "Deploy" (fun _ ->
     |> Zip buildDir (deployDir + "/ApplicationName." + version + ".zip")
 )
 
-Target "NUnitTests" (fun _ ->
+Target "Test" (fun _ ->
     let testDll = !! (buildDir + "/Tests.dll")
     testDll
     |> NUnit3 (fun p ->
@@ -55,9 +55,9 @@ Target "Release" (fun _ ->
 ==> "Deploy"
 
 "Build"
-==> "NUnitTests"
+==> "Test"
 
-"NunitTests"
+"Test"
 ==> "Release"
 
 // start build
