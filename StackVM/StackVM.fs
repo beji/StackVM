@@ -3,6 +3,8 @@ namespace StackVM
 open System
 open System.IO
 open System.Text.RegularExpressions
+open System.Runtime.Serialization
+open System.Runtime.Serialization.Formatters.Binary
 
 [<AutoOpenAttribute>]
 module Types =
@@ -65,7 +67,6 @@ module AssemblyParser =
         //Trim all lines
         |> List.map (fun line -> line.Trim())
     let parse (lines : string list) =
-        printfn "parsing %A" lines
         lines
         |> List.map (fun line ->
             let statement = orElse{
@@ -80,6 +81,23 @@ module AssemblyParser =
             match statement with
             | Some x -> x
             | None -> Ignore)    
+
+module Compiler =
+    let serializeBinary<'a> (x :'a) =
+        let binFormatter = new BinaryFormatter()
+
+        use stream = new MemoryStream()
+        binFormatter.Serialize(stream, x)
+        stream.ToArray()
+
+    let deserializeBinary<'a> (arr : byte[]) =
+        let binFormatter = new BinaryFormatter()
+
+        use stream = new MemoryStream(arr)
+        binFormatter.Deserialize(stream) :?> 'a
+
+    let serializeSasm = serializeBinary<Instruction list>
+    let deserializeSasm = deserializeBinary<Instruction list>
 
 module Stack =
     let initialState = []
@@ -135,24 +153,89 @@ module Stack =
                 printfn "%s i do not know that instruction" dbgIdentifier 
                 currentState
 
+    let fold state instructions =
+        List.fold(fun stack instruction ->
+            calcNewState stack instruction
+        ) state instructions
+
 module Main =
+
+    [<Literal>]
+    let FlagInterpret = "i"
+    [<Literal>]
+    let FlagCompile = "c"
+    [<Literal>]
+    let FlagExecute = "e" 
 
     [<EntryPoint>]
     let main argv =
-        printfn "%A" argv
-        
-        argv
-        |> Array.iter (fun arg ->
-            if File.Exists arg then
-                printfn "parsing File %s" arg
-                File.ReadAllLines arg
-                |> Array.toList
-                |> AssemblyParser.strip
-                |> AssemblyParser.parse
-                |> List.fold (fun stack instruction ->
-                    Stack.calcNewState stack instruction
-                ) Stack.initialState
-                |> printfn "final stack: %A"
-        ) 
 
-        0 // return an integer exit code
+        let args = Array.toList argv
+
+        match args with
+        | [] -> 0
+        | flag::paths ->
+            match flag with
+            | FlagInterpret ->
+                paths
+                |> List.iter (fun arg ->
+                    if File.Exists arg then
+                        File.ReadAllLines arg
+                        |> Array.toList
+                        |> AssemblyParser.strip
+                        |> AssemblyParser.parse
+                        |> Stack.fold Stack.initialState
+                        |> printfn "final stack: %A"
+                )
+                0
+            | FlagCompile ->
+                paths
+                |> List.iter (fun arg ->
+                    if File.Exists arg then
+
+                        let path = 
+                            let fullPath = Path.GetFullPath(arg)
+                            fullPath.Split [|'/'; '\\'|]
+                            |> Array.toList
+                            |> List.rev
+                            |> List.tail
+                            |> List.rev
+                            |> List.fold (fun path partial -> 
+                                match path with
+                                | "" -> partial
+                                | _ -> sprintf "%s/%s" path partial) ""
+
+                        let fileName =
+                            let fullName =
+                                arg.Split [|'/'; '\\'|]
+                                |> Array.toList
+                                |> List.rev
+                                |> List.head
+                            fullName.Split [|'.'|]
+                            |> Array.toList
+                            |> List.head
+                        let target = sprintf "%s/%s.%s" path fileName "svm"
+
+                        let binaryResult =
+                            File.ReadAllLines arg
+                            |> Array.toList
+                            |> AssemblyParser.strip
+                            |> AssemblyParser.parse
+                            |> Compiler.serializeSasm
+
+                        if not <| File.Exists target then
+                            let fs = File.Create target
+                            fs.Close()                            
+                        File.WriteAllBytes(target, binaryResult)
+                        )
+                0
+            | FlagExecute ->
+                paths
+                |> List.iter (fun arg ->
+                    if File.Exists arg then
+                        File.ReadAllBytes arg
+                        |> Compiler.deserializeSasm
+                        |> Stack.fold Stack.initialState
+                        |> printfn "final stack: %A")
+                0
+            | _ -> 1

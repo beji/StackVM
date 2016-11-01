@@ -2,9 +2,11 @@
 #r "./packages/FAKE/tools/FakeLib.dll"
 
 open Fake
+open Fake.Testing.NUnit3
 
 // Directories
 let buildDir  = "./build/"
+let releaseDir = "./dist"
 let deployDir = "./deploy/"
 
 
@@ -18,7 +20,7 @@ let version = "0.1"  // or retrieve from CI server
 
 // Targets
 Target "Clean" (fun _ ->
-    CleanDirs [buildDir; deployDir]
+    CleanDirs [buildDir; deployDir; releaseDir]
 )
 
 Target "Build" (fun _ ->
@@ -28,15 +30,35 @@ Target "Build" (fun _ ->
 )
 
 Target "Deploy" (fun _ ->
-    !! (buildDir + "/**/*.*")
+    !! (releaseDir + "/**/*.*")
     -- "*.zip"
-    |> Zip buildDir (deployDir + "ApplicationName." + version + ".zip")
+    |> Zip buildDir (deployDir + "/ApplicationName." + version + ".zip")
 )
 
-// Build order
+Target "NUnitTests" (fun _ ->
+    let testDll = !! (buildDir + "/Tests.dll")
+    testDll
+    |> NUnit3 (fun p ->
+        {p with
+            ToolPath = "./packages/test/NUnit.ConsoleRunner/tools/nunit3-console.exe"})
+)
+
+Target "Release" (fun _ ->
+    MSBuildRelease releaseDir "Build" appReferences
+    |> Log "AppBuild-Output:"
+)
+
 "Clean"
-  ==> "Build"
-  ==> "Deploy"
+==> "Build"
+
+"Release"
+==> "Deploy"
+
+"Build"
+==> "NUnitTests"
+
+"NunitTests"
+==> "Release"
 
 // start build
 RunTargetOrDefault "Build"
