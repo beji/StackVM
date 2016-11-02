@@ -6,7 +6,7 @@ open Fake.Testing.NUnit3
 
 // Directories
 let buildDir  = "./build/"
-let releaseDir = "./dist"
+let releaseDir = buildDir
 let deployDir = "./deploy/"
 
 
