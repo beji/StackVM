@@ -12,7 +12,7 @@ sub
 push 2
 div
 print
-push 40
+copy
 sub
 halt
 # Nothing below the halt should be executed

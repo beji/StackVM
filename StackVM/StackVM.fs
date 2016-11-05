@@ -18,6 +18,7 @@ module Types =
         | Print
         | Ignore
         | Halt
+        | Copy
 
 module AssemblyParser =
 
@@ -43,6 +44,7 @@ module AssemblyParser =
     let getDivisionLine = simpleLineHelper "div" Divide
     let getPopLine = simpleLineHelper "pop" Pop
     let getHaltLine = simpleLineHelper "halt" Halt
+    let getCopyLine = simpleLineHelper "copy" Copy
 
     let getPushLine input =
         if input = null then None
@@ -78,7 +80,8 @@ module AssemblyParser =
                 return! getMultiplyLine line
                 return! getPrintLine line
                 return! getPopLine line  
-                return! getHaltLine line              
+                return! getHaltLine line
+                return! getCopyLine line             
             }
             match statement with
             | Some x -> x
@@ -156,6 +159,14 @@ module Stack =
             | Halt ->
                 printfn "%s halt detected" dbgIdentifier
                 currentState
+            | Copy ->
+                match currentState with
+                | x::tail ->
+                    printfn "%s copying %i" dbgIdentifier x
+                    x :: x :: tail
+                | _ ->
+                    printfn "%s something went horribly wrong with the stack while trying to copy" dbgIdentifier
+                    currentState
             | Ignore ->
                 printfn "%s i do not know that instruction" dbgIdentifier 
                 currentState

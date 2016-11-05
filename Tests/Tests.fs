@@ -66,6 +66,13 @@ module Instructions =
             |> Stack.fold Stack.initialState
         Assert.AreEqual(List.head result, 40)
 
+    [<Test>]
+    let ``Copy copies the top element of the stack`` () =
+        let result = 
+            [Copy]
+            |> Stack.fold [4]
+        Assert.AreEqual(result, [4;4])
+
 module Parser =
     [<Test>]
     let ``push 6 leads to Push 6 Instruction`` () =
@@ -111,3 +118,8 @@ module Parser =
     let ``halt leads to Halt Instruction`` () =
         let result = AssemblyParser.parse ["halt"]
         Assert.AreEqual(List.head result, Halt)                                        
+
+    [<Test>]
+    let ``copy leads to Copy Insctruction`` () =
+        let result = AssemblyParser.parse ["copy"]
+        Assert.AreEqual(List.head result, Copy)
