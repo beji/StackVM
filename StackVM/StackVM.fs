@@ -64,7 +64,7 @@ module AssemblyParser =
         //Filter comments
         |> List.filter (fun line -> not <| line.StartsWith("#"))
         //Filter empty lines
-        |> List.filter (fun line -> line = "" |> not)
+        |> List.filter (fun line -> line <> "")
         //Trim all lines
         |> List.map (fun line -> line.Trim())
     
