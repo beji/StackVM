@@ -1,6 +1,7 @@
 // include Fake libs
 #r "./packages/build/FAKE/tools/FakeLib.dll"
 #r "./packages/build/Fantomas/lib/FantomasLib.dll"
+#r "./packages/build/FSharp.Compiler.Service/lib/net45/FSharp.Compiler.Service.dll"
 
 open Fake
 open Fake.Testing.NUnit3
