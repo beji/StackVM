@@ -4,6 +4,7 @@ nuget FSharp.Core
 group Build
     source https://www.nuget.org/api/v2
     nuget FAKE
+    nuget Fantomas
 
 group Test
     source https://www.nuget.org/api/v2

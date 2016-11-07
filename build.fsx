@@ -1,14 +1,18 @@
 // include Fake libs
 #r "./packages/build/FAKE/tools/FakeLib.dll"
+#r "./packages/build/Fantomas/lib/FantomasLib.dll"
 
 open Fake
 open Fake.Testing.NUnit3
+open Fantomas.FakeHelpers
+open Fantomas.FormatConfig
+
 
 // Directories
 let buildDir  = "./build/"
 let releaseDir = buildDir
 let deployDir = "./deploy/"
-
+let fantomasConfig = FormatConfig.Default
 
 // Filesets
 let appReferences  =
@@ -57,7 +61,14 @@ Target "BuildRelease" (fun _ ->
     |> Log "AppBuild-Output:"
 )
 
-Target "Release" (fun _ -> ())
+Target "FormatCode" (fun _ ->
+    !! "StackVM/**/*.fs"
+    ++ "Tests/**/*.fs"
+    |> formatCode fantomasConfig
+    |> Log "Formatted files: "
+)
+
+Target "Release" (ignore)
 
 "Clean"
 ==> "Build"
