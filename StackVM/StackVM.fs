@@ -109,66 +109,73 @@ module Compiler =
 module Stack =
     let initialState = []
 
+    let printDebug str =
+        #if DEBUG
+        printfn "[StackVM]: %s" str
+        #else
+        ()
+        #endif
+
     let calcNewState currentState instruction =
             let dbgIdentifier = "[StackVM]:"
             match instruction with
             | Push x ->
                 // Push x on top of the stack
-                printfn "%s pushing %i on the stack" dbgIdentifier x
+                printDebug <| sprintf "pushing %i on the stack" x
                 x :: currentState
             | Pop ->
                 // Pop the top of the stack
-                printfn "%s popping from the stack" dbgIdentifier
+                printDebug "popping from the stack"
                 List.tail currentState
             | Add ->
                 match currentState with
                 | x::y::rst ->
-                    printfn "%s adding %i and %i" dbgIdentifier x y
+                    printDebug <| sprintf "adding %i and %i" x y
                     (y + x) :: rst
                 | _ ->
-                    printfn "%s something went horribly wrong with the stack while trying to add" dbgIdentifier
+                    printDebug "something went horribly wrong with the stack while trying to add"
                     currentState
             | Subtract ->
                 match currentState with
                 | x::y::rst ->
-                    printfn "%s subtracting %i and %i" dbgIdentifier x y
+                    printDebug <| sprintf "subtracting %i and %i" x y
                     (y - x) :: rst
                 | _ ->
-                    printfn "%s something went horribly wrong with the stack while trying to subtract" dbgIdentifier
+                    printDebug "something went horribly wrong with the stack while trying to subtract"
                     currentState
             | Divide ->
                 match currentState with
                 | x::y::rst ->
-                    printfn "%s dividing %i and %i" dbgIdentifier x y
+                    printDebug <| sprintf "dividing %i and %i" x y
                     (y / x) :: rst
                 | _ ->
-                    printfn "%s something went horribly wrong with the stack while trying to divide" dbgIdentifier
+                    printDebug "something went horribly wrong with the stack while trying to divide"
                     currentState
             | Multiply ->
                 match currentState with
                 | x::y::rst ->
-                    printfn "%s multiplying %i and %i" dbgIdentifier x y
+                    printDebug <| sprintf "multiplying %i and %i" x y
                     (y * x) :: rst
                 | _ ->
-                    printfn "%s something went horribly wrong with the stack while trying to Multiply" dbgIdentifier
+                    printDebug "something went horribly wrong with the stack while trying to Multiply"
                     currentState
             | Print ->
-                printfn "%s printing the current head" dbgIdentifier
+                printDebug "printing the current head"
                 printfn "%i" <| List.head currentState
                 currentState
             | Halt ->
-                printfn "%s halt detected" dbgIdentifier
+                printDebug "halt detected"
                 currentState
             | Copy ->
                 match currentState with
                 | x::tail ->
-                    printfn "%s copying %i" dbgIdentifier x
+                    printDebug <| sprintf "copying %i" x
                     x :: x :: tail
                 | _ ->
-                    printfn "%s something went horribly wrong with the stack while trying to copy" dbgIdentifier
+                    printDebug "something went horribly wrong with the stack while trying to copy"
                     currentState
             | Ignore ->
-                printfn "%s i do not know that instruction" dbgIdentifier 
+                printDebug "i do not know that instruction" 
                 currentState
     let fold state instructions =
         let rec _fold stack instructions =
