@@ -46,7 +46,7 @@ module AssemblyParser =
     let getCopyLine = simpleLineHelper "copy" Copy
     
     let getPushLine input = 
-        if input = null then None
+        if isNull input then None
         else 
             let m = Regex.Match(input, "push (\d+)")
             if m.Success then //Some(List.tail [ for g in m.Groups -> g.Value ])
