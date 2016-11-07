@@ -104,7 +104,7 @@ module Compiler =
     let serializeSasm = serializeBinary<Instruction list>
     let deserializeSasm = deserializeBinary<Instruction list>
 
-    let stripIgnores = List.filter(fun instruction -> instruction = Ignore |> not)
+    let stripIgnores = List.filter(fun instruction -> instruction <> Ignore)
 
 module Stack =
     let initialState = []
