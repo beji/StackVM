@@ -3,13 +3,13 @@ source https://www.nuget.org/api/v2
 nuget FSharp.Core
 
 group Build
-	framework: auto-detect
+    framework: auto-detect
     source https://www.nuget.org/api/v2
     nuget FAKE
     nuget Fantomas
 
 group Test
-	framework: auto-detect
+    framework: auto-detect
     source https://www.nuget.org/api/v2
     nuget NUnit
     nuget NUnit.Runners
